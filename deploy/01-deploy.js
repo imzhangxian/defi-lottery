@@ -15,6 +15,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     let vrfCoordinatorV2Address, subscriptionId, vrfCoordinatorV2Mock
 
     if (chainId === 31337) {
+        log("deploy Raffle on dev network ...")
         vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
         const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
@@ -23,6 +24,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
 
     } else {
+        log("deploy Raffle on Goerli ...")
         vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
         subscriptionId = networkConfig[chainId]["subscriptionId"]
     }
@@ -46,6 +48,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     })
 
     log("Raffle deployed!")
+
+    if (chainId === 31337) {
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, raffle.address)
+    }
 
     // verify if on staging (not dev chains)
     if (! developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
