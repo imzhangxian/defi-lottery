@@ -36,6 +36,11 @@ module.exports = {
             chainId: 5,
         },
     }, 
+    etherscan: {
+        apiKey: {
+          goerli: ETHERSCAN_API_KEY
+        }
+    }, 
     solidity: {
         compilers: [
             {
