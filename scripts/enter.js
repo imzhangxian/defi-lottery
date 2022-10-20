@@ -4,10 +4,11 @@ async function enterRaffle() {
     const raffle = await ethers.getContract("Raffle")
     const entranceFee = await raffle.getEntranceFee()
 
-    await raffle.enterRaffle({ value: entranceFee + 1 })
+    console.log(`enter raffle with fee: ${entranceFee}`)
+
+    await raffle.enterRaffle({ value: entranceFee })
     console.log("Entered!")
     
-    await raffle.pickRandomWinner()
 }
 
 enterRaffle()
