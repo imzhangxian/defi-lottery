@@ -79,8 +79,8 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         // ((block.timestamp - s_lastTimeStamp) > i_interval);
         bool timePassed = block.timestamp > s_lastTimeStamp + i_interval;
         upkeepNeeded = (isOpen && hasPlayers && hasBalance && timePassed);
-        // not working while return 0x00 here. if 0x on chainlink automation by default.
-        // not sure whether chainlink will check the consistency of performData.
+        // Root cause should be performUpkeep reverted by unregistered VRF; 
+        // should have nothing to do with performData
         return (upkeepNeeded, "0x");
     }
 
