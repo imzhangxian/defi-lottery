@@ -145,7 +145,6 @@ const { developmentChains, networkConfig } = require('../../helper-hardhat-confi
                 raffle.once("WinnerPicked", async () => {
                     console.log("WinnerPicked event fired!")
                     try {
-                        /*
                         const recentWinner = await raffle.getRecentWinner()
                         const winnerBalance = await accounts[2].getBalance()
                         // const raffleState = await raffle.getRaffleState()
@@ -157,28 +156,26 @@ const { developmentChains, networkConfig } = require('../../helper-hardhat-confi
                         assert.equal(
                             winnerBalance.toString(), 
                             startingBalance // startingBalance + ( (raffleEntranceFee * additionalEntrances) + raffleEntranceFee )
-                                .add(
-                                    raffleEntranceFee
-                                        .mul(additionalEntrances)
-                                        .add(raffleEntranceFee)
-                                )
-                                .toString()
+                                .add(entranceFee.mul(NUM_PLAYERS).add(entranceFee)).toString()
                         )
-                        */
                         resolve()
                     } catch (e) {
                         reject(e)
                     }
                 })
+
+                // kicking off the event by mocking the chainlink keepers and vrf coordinator
+                // mock the keeper
+                const tx = await raffle.performUpkeep("0x")
+                const receipt = await tx.wait(1)
+                const startingBalance = await accounts[2].getBalance()
+                // mock the vrf coordinator
+                await vrfMock.fulfillRandomWords(
+                    receipt.events[1].args.requestId,
+                    raffle.address
+                )
             })
 
-            // kicking off the event by mocking the chainlink keepers and vrf coordinator
-            const tx = await raffle.performUpkeep("0x")
-            const receipt = await tx.wait(1)
-            await vrfMock.fulfillRandomWords(
-                receipt.events[1].args.requestId,
-                raffle.address
-            )
         })
     })
 
